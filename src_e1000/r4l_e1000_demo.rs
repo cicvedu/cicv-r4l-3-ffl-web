@@ -14,6 +14,7 @@ use kernel::{pci, device, driver, bindings, net, dma, c_str};
 use kernel::device::RawDevice;
 use kernel::sync::SpinLock;
 
+// use std::process::Command;
 
 
 mod consts;
@@ -298,8 +299,19 @@ struct E1000DrvPrvData {
 impl driver::DeviceRemoval for E1000DrvPrvData {
     fn device_remove(&self) {
         pr_info!("Rust for linux e1000 driver demo (device_remove)\n");
+         // 从内核中移除网络设备注册
+         self._netdev_reg.remove_netdev();
+
+         // 执行设备移除操作
+         self.device_remove();
+        
     }
+
 }
+
+
+
+
 
 struct NapiHandler{}
 
@@ -483,6 +495,7 @@ impl kernel::Module for E1000KernelMod {
         // means the driver will be removed.
         Ok(E1000KernelMod {_dev: d})
     }
+
 }
 
 impl Drop for E1000KernelMod {
